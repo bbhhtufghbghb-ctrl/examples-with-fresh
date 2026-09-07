@@ -1,26 +1,19 @@
-// routes/index.tsx
 import { useState } from "preact/hooks";
 import WalletSwap from "../components/WalletSwap.tsx";
 import { createReferralCode, getReferralStats } from "../utils.ts";
 
 export default function Home() {
-  const [address, setAddress] = useState("");
   const [connected, setConnected] = useState(false);
   const [referralCode, setReferralCode] = useState("");
   const [stats, setStats] = useState<any>(null);
   const [userAddress, setUserAddress] = useState("");
 
   const connectWallet = () => {
-    // محاكاة اتصال المحفظة
     const mockAddress = "0x" + Math.random().toString(16).substring(2, 42);
     setUserAddress(mockAddress);
     setConnected(true);
-    
-    // إنشاء كود إحالة تلقائي
     const code = createReferralCode(mockAddress);
     setReferralCode(code);
-    
-    // جلب الإحصائيات
     getReferralStats(mockAddress).then(setStats);
   };
 
@@ -29,7 +22,7 @@ export default function Home() {
       <div class="max-w-4xl mx-auto">
         <div class="text-center mb-10">
           <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white">
-            🚀 DEX Aggregator
+            DEX Aggregator
           </h1>
           <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
             Best prices across multiple DEXs + Earn with referrals!
@@ -37,10 +30,9 @@ export default function Home() {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* زر ربط المحفظة */}
           <div class="md:col-span-1 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg h-fit">
             <h3 class="font-bold text-gray-900 dark:text-white mb-4">
-              👛 Wallet
+              Wallet
             </h3>
             {!connected ? (
               <button
@@ -63,23 +55,23 @@ export default function Home() {
                     onClick={() => navigator.clipboard.writeText(referralCode)}
                     class="mt-1 text-xs text-blue-500 hover:text-blue-700"
                   >
-                    📋 Copy
+                    Copy
                   </button>
                 </div>
                 {stats && (
                   <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
                     <p class="text-sm">
-                      <span class="text-gray-500 dark:text-gray-400">💰 Rewards:</span>{" "}
+                      <span class="text-gray-500 dark:text-gray-400">Rewards:</span>{" "}
                       <span class="font-bold text-green-600 dark:text-green-400">
                         {stats.totalRewards}
                       </span>
                     </p>
                     <p class="text-sm">
-                      <span class="text-gray-500 dark:text-gray-400">🔄 Swaps:</span>{" "}
+                      <span class="text-gray-500 dark:text-gray-400">Swaps:</span>{" "}
                       <span class="font-bold">{stats.totalSwaps}</span>
                     </p>
                     <p class="text-sm">
-                      <span class="text-gray-500 dark:text-gray-400">👥 Referrals:</span>{" "}
+                      <span class="text-gray-500 dark:text-gray-400">Referrals:</span>{" "}
                       <span class="font-bold">{stats.referralCount}</span>
                     </p>
                   </div>
@@ -88,28 +80,26 @@ export default function Home() {
             )}
           </div>
 
-          {/* مكون الـ Swap */}
           <div class="md:col-span-2">
             <WalletSwap userAddress={connected ? userAddress : undefined} />
           </div>
         </div>
 
-        {/* معلومات نظام الإحالة */}
         <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
           <h3 class="font-bold text-gray-900 dark:text-white mb-2">
-            💡 How Referrals Work
+            How Referrals Work
           </h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-              <span class="font-bold text-green-600 dark:text-green-400">1️⃣</span>
+              <span class="font-bold text-green-600 dark:text-green-400">1</span>
               <p class="text-gray-600 dark:text-gray-300">Share your referral code with friends</p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-              <span class="font-bold text-green-600 dark:text-green-400">2️⃣</span>
+              <span class="font-bold text-green-600 dark:text-green-400">2</span>
               <p class="text-gray-600 dark:text-gray-300">They use your code when swapping</p>
             </div>
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-              <span class="font-bold text-green-600 dark:text-green-400">3️⃣</span>
+              <span class="font-bold text-green-600 dark:text-green-400">3</span>
               <p class="text-gray-600 dark:text-gray-300">You earn 0.1% of their swap fees!</p>
             </div>
           </div>
