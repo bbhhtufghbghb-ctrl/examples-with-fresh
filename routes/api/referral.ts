@@ -1,10 +1,7 @@
-```typescript
-// routes/api/referral.ts
 import { Handlers } from "$fresh/server.ts";
 import { getReferralStats, createReferralCode, verifyReferralCode, getReferrerAddress } from "../../utils.ts";
 
 export const handler: Handlers = {
-  // GET /api/referral/stats?address=0x...
   async GET(req) {
     const url = new URL(req.url);
     const address = url.searchParams.get("address");
@@ -29,7 +26,6 @@ export const handler: Handlers = {
     }
   },
   
-  // POST /api/referral/create
   async POST(req) {
     try {
       const { address } = await req.json();
@@ -53,7 +49,6 @@ export const handler: Handlers = {
     }
   },
   
-  // PUT /api/referral/verify
   async PUT(req) {
     try {
       const { code } = await req.json();
@@ -71,5 +66,3 @@ export const handler: Handlers = {
     }
   }
 };
-```
-
