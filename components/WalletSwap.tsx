@@ -1,4 +1,3 @@
-// components/WalletSwap.tsx
 import { useState } from "preact/hooks";
 import { swapTokens, getBestPrice } from "../utils/aggregator.ts";
 
@@ -31,9 +30,9 @@ export default function WalletSwap({ userAddress }: WalletSwapProps) {
         referralCode,
         bestPrice
       });
-      setResult(`✅ Swapped! TX: ${swapResult.txHash}`);
+      setResult(`Swap completed! TX: ${swapResult.txHash}`);
     } catch (error) {
-      setResult(`❌ Error: ${error.message}`);
+      setResult(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -93,7 +92,7 @@ export default function WalletSwap({ userAddress }: WalletSwapProps) {
 
         <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            🔗 Referral Code (optional)
+            Referral Code (optional)
           </label>
           <input
             type="text"
@@ -116,7 +115,7 @@ export default function WalletSwap({ userAddress }: WalletSwapProps) {
         </button>
 
         {result && (
-          <div class={`mt-4 p-3 rounded-lg ${result.includes("✅") ? "bg-green-100 dark:bg-green-900" : "bg-red-100 dark:bg-red-900"}`}>
+          <div class={`mt-4 p-3 rounded-lg ${result.includes("Error") ? "bg-red-100 dark:bg-red-900" : "bg-green-100 dark:bg-green-900"}`}>
             <p class="text-sm break-all">{result}</p>
           </div>
         )}
