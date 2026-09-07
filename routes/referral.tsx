@@ -1,108 +1,109 @@
 import { useState } from "preact/hooks";
+import WalletSwap from "../components/WalletSwap.tsx";
+import { createReferralCode, getReferralStats } from "../utils.ts";
 
-export default function ReferralPage() {
-  const [address, setAddress] = useState("");
-  const [code, setCode] = useState("");
+export default function Home() {
+  const [connected, setConnected] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
   const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const [userAddress, setUserAddress] = useState("");
 
-  const fetchStats = async () => {
-    if (!address) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/referral/stats?address=${address}`);
-      const data = await res.json();
-      setStats(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createCode = async () => {
-    if (!address) return;
-    try {
-      const res = await fetch("/api/referral/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address })
-      });
-      const data = await res.json();
-      setCode(data.code);
-    } catch (error) {
-      console.error(error);
-    }
+  const connectWallet = () => {
+    const mockAddress = "0x" + Math.random().toString(16).substring(2, 42);
+    setUserAddress(mockAddress);
+    setConnected(true);
+    const code = createReferralCode(mockAddress);
+    setReferralCode(code);
+    getReferralStats(mockAddress).then(setStats);
   };
 
   return (
-    <div class="max-w-2xl mx-auto py-12 px-4">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-        Referral Dashboard
-      </h1>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Your Wallet Address
-          </label>
-          <input
-            type="text"
-            value={address}
-            onChange={(e) => setAddress(e.currentTarget.value)}
-            placeholder="0x..."
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
-          />
-          <div class="flex gap-2 mt-2">
-            <button
-              onClick={createCode}
-              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition"
-            >
-              Generate Code
-            </button>
-            <button
-              onClick={fetchStats}
-              class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition"
-            >
-              Get Stats
-            </button>
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-10">
+          <h1 class="text-4xl font-extrabold text-gray-900 dark:text-white">
+            DEX Aggregator
+          </h1>
+          <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+            Best prices across multiple DEXs + Earn with referrals!
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-1 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg h-fit">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-4">
+              Wallet
+            </h3>
+            {!connected ? (
+              <button
+                onClick={connectWallet}
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition"
+              >
+                Connect Wallet
+              </button>
+            ) : (
+              <div class="space-y-3">
+                <p class="text-sm text-gray-600 dark:text-gray-400 break-all">
+                  <span class="font-semibold">Address:</span> {userAddress.substring(0, 10)}...
+                </p>
+                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Your Referral Code</p>
+                  <p class="text-lg font-mono font-bold text-blue-600 dark:text-blue-400">
+                    {referralCode}
+                  </p>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(referralCode)}
+                    class="mt-1 text-xs text-blue-500 hover:text-blue-700"
+                  >
+                    Copy
+                  </button>
+                </div>
+                {stats && (
+                  <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
+                    <p class="text-sm">
+                      <span class="text-gray-500 dark:text-gray-400">Rewards:</span>{" "}
+                      <span class="font-bold text-green-600 dark:text-green-400">
+                        {stats.totalRewards}
+                      </span>
+                    </p>
+                    <p class="text-sm">
+                      <span class="text-gray-500 dark:text-gray-400">Swaps:</span>{" "}
+                      <span class="font-bold">{stats.totalSwaps}</span>
+                    </p>
+                    <p class="text-sm">
+                      <span class="text-gray-500 dark:text-gray-400">Referrals:</span>{" "}
+                      <span class="font-bold">{stats.referralCount}</span>
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div class="md:col-span-2">
+            <WalletSwap userAddress={connected ? userAddress : undefined} />
           </div>
         </div>
-        
-        {code && (
-          <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-            <p class="text-sm text-gray-500 dark:text-gray-400">Your Referral Code</p>
-            <p class="text-2xl font-mono font-bold text-green-600 dark:text-green-400">
-              {code}
-            </p>
-          </div>
-        )}
-        
-        {stats && (
-          <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-2">Statistics</h3>
-            <div class="grid grid-cols-3 gap-4">
-              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">
-                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.totalRewards || "0"}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Total Rewards</p>
-              </div>
-              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">
-                <p class="text-2xl font-bold text-green-600 dark:text-green-400">
-                  {stats.totalSwaps || 0}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Total Swaps</p>
-              </div>
-              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg text-center">
-                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                  {stats.referralCount || 0}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Referrals</p>
-              </div>
+
+        <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+          <h3 class="font-bold text-gray-900 dark:text-white mb-2">
+            How Referrals Work
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+              <span class="font-bold text-green-600 dark:text-green-400">1</span>
+              <p class="text-gray-600 dark:text-gray-300">Share your referral code with friends</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+              <span class="font-bold text-green-600 dark:text-green-400">2</span>
+              <p class="text-gray-600 dark:text-gray-300">They use your code when swapping</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+              <span class="font-bold text-green-600 dark:text-green-400">3</span>
+              <p class="text-gray-600 dark:text-gray-300">You earn 0.1% of their swap fees!</p>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
